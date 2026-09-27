@@ -1,6 +1,8 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from forms.user import Base
+from aiogram.fsm.context import FSMContext
 
 router = Router()
 
@@ -55,8 +57,22 @@ async def answer(message: Message):
     await message.answer("Вернуться в меню", reply_markup=returns_buttons())
 
 @router.message(F.text.lower() == "сделать заказ")
-async def answer(message: Message):
-    await message.answer("Выберите один из рестаронов:")
+async def answer(message: Message, state = FSMContext):
+    await message.answer("Назовите свое имя")
+    await state.set_state(Base.name)
+
+@router.message(Base.name, F.text)
+async def procces_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+
+    await message.answer("Прекрасно\n Теперь напишите адрес куда вам доставить")
+    await state.set_state(Base.location)
+
+@router.message(Base.location, F.text)
+async def procces_location(message: Message, state: FSMContext):
+    await state.update_data(location=message.text)
+
+    await message.answer("Все ваш заказ принят, и будет доставлен вам в течении 30 минут", reply_markup=returns_buttons())
 
 @router.message()
 async def mess(message: Message):
