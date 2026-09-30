@@ -65,14 +65,19 @@ async def answer(message: Message, state = FSMContext):
 async def procces_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
 
-    await message.answer("Прекрасно\n Теперь напишите адрес куда вам доставить")
+    await message.answer("Прекрасно\n Теперь напишите адрес куда вам доставить ваш заказ")
     await state.set_state(Base.location)
 
 @router.message(Base.location, F.text)
 async def procces_location(message: Message, state: FSMContext):
     await state.update_data(location=message.text)
 
-    await message.answer("Все ваш заказ принят, и будет доставлен вам в течении 30 минут", reply_markup=returns_buttons())
+    data = await state.get_data()
+
+    name = data["name"]
+    location = data["location"] 
+
+    await message.answer(f"Все ваш заказ на имя: {name} принят, и будет доставлен вам в течении 30 минут по адресу {location}", reply_markup=returns_buttons())
 
 @router.message()
 async def mess(message: Message):
