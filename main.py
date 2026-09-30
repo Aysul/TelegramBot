@@ -12,7 +12,7 @@ dp.include_router(router)
 
 async def main():
     bot = Bot(token=TOKEN)
-    print("Start")
+    print("Project to start")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
